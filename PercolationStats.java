@@ -8,7 +8,12 @@ public class PercolationStats {
     private double[] allThresholds;
     private double trials;
 
-    // perform independent trials on an n-by-n grid
+    /**
+     * Perform independent trials on an n-ny-n grid
+     *
+     * @param n      size of gird
+     * @param trials number of trials
+     */
     public PercolationStats(int n, int trials) {
         if (n <= 0 || trials <= 0) throw new IllegalArgumentException();
         // init all sites to be blocked
@@ -38,28 +43,43 @@ public class PercolationStats {
 
     }
 
-    // sample mean of percolation threshold
+    /**
+     * Return sample mean of percolation threshold
+     *
+     * @return sample mean
+     */
     public double mean() {
         return StdStats.mean(allThresholds);
     }
 
-    // sample standard deviation of percolation threshold
+    /**
+     * Return sample standard deviation of percolation threshold
+     *
+     * @return standard deviation
+     */
     public double stddev() {
         return StdStats.stddev(allThresholds);
     }
 
-    // low endpoint of 95% confidence interval
+    /**
+     * Return low endpoint of 95% confidence interval
+     *
+     * @return low endpoint
+     */
     public double confidenceLo() {
         return mean() - ((CONFIDENCE_95 * stddev()) / Math.sqrt(trials));
     }
 
-    // high endpoint of 95% confidence interval
+    /**
+     * Return high endpoint of 95% confidence interval
+     *
+     * @return high endpoint
+     */
     public double confidenceHi() {
         return mean() + ((CONFIDENCE_95 * stddev()) / Math.sqrt(trials));
 
     }
 
-    // test client (see below)
     public static void main(String[] args) {
 
         if (args.length != 0) {
