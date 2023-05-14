@@ -4,18 +4,38 @@ public class Percolation {
     private int n;
     private boolean[][] sites;
     private int openSites;
-    private WeightedQuickUnionUF sitesConnetedToTheTop;
+    private WeightedQuickUnionUF sitesConnectedToTheTop;
     private WeightedQuickUnionUF sitesPercolating;
+    // virtual top site
+    // virtual bottom site
 
 
     public Percolation(int n) {
         if (n <= 0) throw new IllegalArgumentException();
+
         this.sites = new boolean[n][n];
         this.n = n;
         this.openSites = 0;
 
-        this.sitesConnetedToTheTop = new WeightedQuickUnionUF(n * n);
-        this.sitesPercolating = new WeightedQuickUnionUF(n * n);
+        sitesConnectedToTheTop = new WeightedQuickUnionUF(n * n);
+        virtualTopSite(sitesConnectedToTheTop);
+
+        sitesPercolating = new WeightedQuickUnionUF(n * n);
+        virtualTopSite(sitesPercolating);
+        virtualBottomSite(sitesPercolating);
+
+    }
+
+    private void virtualTopSite(WeightedQuickUnionUF uf) {
+        for (int i = 1; i < this.n; i++) {
+            uf.union(0, i);
+        }
+    }
+
+    private void virtualBottomSite(WeightedQuickUnionUF uf) {
+        for (int i = n * n - 2; i > (n * n - 1) - n; i--) {
+            uf.union(n * n - 1, i);
+        }
     }
 
     public int numberOfOpenSites() {
@@ -37,49 +57,44 @@ public class Percolation {
             int index = calculateIndex(row, col);
             // element on the top
             if (!(row - 1 == 0) && isOpen(row - 1, col)) {
-                sitesPercolating.union(index, calculateIndex(row - 1, col));
-                sitesConnetedToTheTop.union(index, calculateIndex(row - 1, col));
+                int secondIndex = calculateIndex(row - 1, col);
+                sitesPercolating.union(index, secondIndex);
+                sitesConnectedToTheTop.union(index, secondIndex);
             }
 
             // element on the bottom
             if (!(row + 1 > n) && isOpen(row + 1, col)) {
-                sitesPercolating.union(index, calculateIndex(row + 1, col));
-                sitesConnetedToTheTop.union(index, calculateIndex(row + 1, col));
+                int secondIndex = calculateIndex(row + 1, col);
+                sitesPercolating.union(index, secondIndex);
+                sitesConnectedToTheTop.union(index, secondIndex);
             }
 
             // element on the left
             if (!(col - 1 == 0) && isOpen(row, col - 1)) {
-                sitesPercolating.union(index, calculateIndex(row, col - 1));
-                sitesConnetedToTheTop.union(index, calculateIndex(row, col - 1));
+                int secondIndex = calculateIndex(row, col - 1);
+                sitesPercolating.union(index, secondIndex);
+                sitesConnectedToTheTop.union(index, secondIndex);
             }
 
             // element on the right
             if (!(col + 1 > n) && isOpen(row, col + 1)) {
-                sitesPercolating.union(index, calculateIndex(row, col + 1));
-                sitesConnetedToTheTop.union(index, calculateIndex(row, col + 1));
+                int secondIndex = calculateIndex(row, col + 1);
+                sitesPercolating.union(index, secondIndex);
+                sitesConnectedToTheTop.union(index, secondIndex);
             }
         }
+    }
+
+    private int calculateIndex(int row, int col) {
+        return (row - 1) * n + (col - 1);
     }
 
     public boolean isFull(int row, int col) {
         isGridItemInRange(row, col);
         if (!isOpen(row, col)) return false;
 
-
-        // if (sitesConnetedToTheTop.find(0) != sitesConnetedToTheTop.find(n - 1))
-        connectSitesOnFirstLine(this.sitesConnetedToTheTop);
-        return (sitesConnetedToTheTop.find(0) ==
-                sitesConnetedToTheTop.find(calculateIndex(row, col)));
-    }
-
-    public boolean percolates() {
-        if (n == 1 && !isOpen(1, 1)) return false;
-
-        // if (sitesPercolating.find(0) != sitesPercolating.find(n - 1))
-        connectSitesOnFirstLine(sitesPercolating);
-        // if (sitesPercolating.find(n * n - n) != sitesPercolating.find(n * n - 1))
-        connectSitesOnLastLine(sitesPercolating);
-        return (sitesPercolating.find(0) == sitesPercolating.find(n * n - 1));
+        return (sitesConnectedToTheTop.find(0) ==
+                sitesConnectedToTheTop.find(calculateIndex(row, col)));
     }
 
     private void isGridItemInRange(int row, int col) {
@@ -87,32 +102,53 @@ public class Percolation {
             throw new IllegalArgumentException();
     }
 
-    private int calculateIndex(int row, int col) {
-        return (row - 1) * n + (col - 1);
+    // private void connectSitesOnFirstLine(WeightedQuickUnionUF uf) {
+    //     for (int i = 1; i < this.n; i++) {
+    //         if (sites[0][i - 1] != sites[0][i]) uf.union(0, i);
+    //     }
+    // }
+
+
+    public boolean percolates() {
+        if (n == 1 && !isOpen(1, 1)) return false;
+
+        // if (sitesPercolating.find(0) != sitesPercolating.find(n - 1))
+        // connectSitesOnFirstLine(sitesPercolating);
+        // if (sitesPercolating.find(n * n - n) != sitesPercolating.find(n * n - 1))
+        // connectSitesOnLastLine(sitesPercolating);
+        return (sitesPercolating.find(0) == sitesPercolating.find(n * n - 1));
     }
 
-    private void connectSitesOnFirstLine(WeightedQuickUnionUF uf) {
-        for (int i = 1; i < this.n; i++) {
-            if (sites[0][i - 1] != sites[0][i]) uf.union(0, i);
-        }
 
+    // private void connectSitesOnLastLine(WeightedQuickUnionUF uf) {
+    //     for (int i = n * n - 2; i > (n * n - 1) - n; i--) {
+    //         uf.union(n * n - 1, i);
+    //     }
+    //
+    //     for (int i = n * n - 2; i > (n * n - 1) - n; i--) {
+    //         if (sites[n - 1][i - (n - 1) * n] != sites[n - 1][(i + 1) - (n - 1) * n])
+    //             uf.union(n * n - 1, i);
+    //     }
+    //
+    //     // for (int i = 1; i < n; i++) {
+    //     //     if (sites[n - 1][i - 1] != sites[n - 1][i])
+    //     //         uf.union(n * n - 1, (n * n) - 1 - i);
+    //     // }
+    // }
+
+    public static void main(String[] args) {
+        Percolation percolation = new Percolation(3);
+
+        System.out.println(percolation.isFull(1, 2));
+        System.out.println(percolation.isOpen(1, 2));
+        percolation.open(1, 2);
+        System.out.println(percolation.isFull(1, 2));
+        System.out.println(percolation.isOpen(1, 2));
+        percolation.open(3, 2);
+        System.out.println(percolation.isFull(3, 2));
+        System.out.println(percolation.isOpen(3, 2));
+        percolation.open(2, 2);
+        System.out.println(percolation.isFull(3, 2));
     }
-
-    private void connectSitesOnLastLine(WeightedQuickUnionUF uf) {
-        for (int i = n * n - 2; i > (n * n - 1) - n; i--) {
-            uf.union(n * n - 1, i);
-        }
-
-        for (int i = n * n - 2; i > (n * n - 1) - n; i--) {
-            if (sites[n - 1][i - (n - 1) * n] != sites[n - 1][(i + 1) - (n - 1) * n])
-                uf.union(n * n - 1, i);
-        }
-
-        // for (int i = 1; i < n; i++) {
-        //     if (sites[n - 1][i - 1] != sites[n - 1][i])
-        //         uf.union(n * n - 1, (n * n) - 1 - i);
-        // }
-    }
-
 
 }

@@ -84,3 +84,11 @@ public class PercolationStats {
 ---
 
 ### Useful resources that have helped me in completing this assignment
+
+🔗[Assignment video pt.1](https://www.youtube.com/watch?v=kIYKCsvG6UI)
+
+🔗[Assignment video pt.2](https://www.youtube.com/watch?v=QDUya7s3_Zg)
+
+🔗[Assignment video pt.3](https://www.youtube.com/watch?v=1RQz8ITHLME)
+
+🔗[Percolation problem exploanation](https://www.youtube.com/watch?v=KNgfOmlLgh8&t=1s)

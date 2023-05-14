@@ -6,8 +6,6 @@ public class PercolationStats {
 
     private static final double CONFIDENCE_95 = 1.96;
     private double[] allThresholds;
-    private double threshold;
-    private double gridSize;
     private double trials;
 
     // perform independent trials on an n-by-n grid
@@ -16,8 +14,8 @@ public class PercolationStats {
         // init all sites to be blocked
         Percolation percolation;
         allThresholds = new double[trials];
-        threshold = 0;
-        gridSize = n * n;
+        double threshold = 0;
+        double gridSize = n * n;
         this.trials = trials;
 
         for (int i = trials; i > 0; i--) {
